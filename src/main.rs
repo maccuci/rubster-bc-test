@@ -1,6 +1,8 @@
 use crate::block::{Block, Blockchain};
+use crate::contract::Contract;
 
 mod block;
+mod contract;
 
 fn main() {
     let mut chain: Blockchain = Blockchain::invoke(0, "Argona".to_string(), 0);
@@ -14,5 +16,26 @@ fn main() {
             "Blockchain Collection - {}\nID: #{} - Hash: {} - Hash Previous: {}\n",
             block.data.to_uppercase(), block.index, block.hash, block.hash_previous
         )
+    }
+
+    let mut contract = Contract::create();
+
+    contract.add_blockchain_item(chain);
+    contract.deposit(1);
+    println!("Your balance: {}", contract.get_balance());
+
+    if let Err(err) = contract.withdraw(50) {
+        println!("Error when trying withdraw.");
+        return;
+    }
+    println!("Your new balance is: {}", contract.get_balance());
+    for block in contract.blockchains {
+        print!(
+            "Blockchain Collection - {}\nID: #{} - Hash: {} - Hash Previous: {}\n",
+            block.data.to_uppercase(),
+            block.index,
+            block.hash,
+            block.hash_previous
+        );
     }
 }

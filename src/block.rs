@@ -1,17 +1,41 @@
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 use chrono::{Duration, Utc};
+use serde::{Deserialize, Serialize};
 
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Block {
     pub index: u32,
+    #[serde(with = "serde_duration")]
     pub created_time: Duration,
     pub data: String,
     pub hash_previous: u64,
     pub hash: u64
 }
 
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Blockchain {
     pub blocks: Vec<Block>
+}
+
+mod serde_duration {
+    use serde::{Serializer, Deserializer, Deserialize};
+    use chrono::Duration;
+
+    pub fn serialize<S>(value: &Duration, serializer: S) -> Result<S::Ok, S::Error>
+        where
+            S: Serializer,
+    {
+        serializer.serialize_i64(value.num_seconds())
+    }
+
+    pub fn deserialize<'de, D>(deserializer: D) -> Result<Duration, D::Error>
+        where
+            D: Deserializer<'de>,
+    {
+        let seconds = i64::deserialize(deserializer)?;
+        Ok(Duration::seconds(seconds))
+    }
 }
 
 impl Block {
@@ -51,4 +75,5 @@ impl Blockchain {
     pub fn push(&mut self, block: Block) {
         self.blocks.push(block);
     }
+
 }
