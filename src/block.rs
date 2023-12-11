@@ -3,7 +3,7 @@ use std::hash::{Hash, Hasher};
 use chrono::{Duration, Utc};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub struct Block {
     pub index: u32,
     #[serde(with = "serde_duration")]
@@ -75,5 +75,4 @@ impl Blockchain {
     pub fn push(&mut self, block: Block) {
         self.blocks.push(block);
     }
-
 }

@@ -3,13 +3,14 @@ use crate::block::{Block, Blockchain};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Contract {
+    id: i8,
     pub balance: u64,
     pub blockchains: Vec<Block>
 }
 
 impl Contract {
-    pub fn create() -> Contract {
-        Contract { balance: 0, blockchains: Vec::new() }
+    pub fn create(id: i8) -> Contract {
+        Contract { id, balance: 0, blockchains: Vec::new() }
     }
 
     pub fn get_balance(&self) -> u64 {
@@ -21,16 +22,21 @@ impl Contract {
     }
 
     pub fn withdraw(&mut self, value: u64) -> Result<(), &'static str> {
+        if value < 1  {
+            return Err("Value cannot be 0.");
+        }
         if value > self.balance {
-            Err("Your balance is minor.")
-        } else {
+            return Err("Error: Insufficient balance.")
+        }
         self.balance -= value;
         Ok(())
-        }
     }
 
     pub fn add_blockchain_item(&mut self, blockchain: Blockchain) {
         for block in &blockchain.blocks {
+            if self.blockchains.contains(block) {
+                panic!("The blockchain index {} already exists in the contract.", block.index);
+            }
             self.blockchains.push(
                 Block {
                     index: block.index,
